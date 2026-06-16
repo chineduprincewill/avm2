@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { AppContext } from '../../context/AppContext';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '../../components/ui/dialog';
-import { Search } from 'lucide-react';
+import { Search, Star, UserStar } from 'lucide-react';
 import { formatDateAndTime, replaceCharsWithSpace } from '../../utils/functions';
 import { getVendors } from '../../utils/forms';
 import SkeletonComponent from '../../components/skeleton-component';
@@ -9,6 +9,8 @@ import DataTable from '../../components/data-table';
 import VendorReviewDashboard from './vendor-review-dashboard';
 import VendorReviewComponent from './vendor-review-component';
 import FilterComponent from '../../components/filter-component';
+import { BsStarFill } from 'react-icons/bs';
+import VendorRatingModal from './vendor-rating-modal';
 
 const Vendors = () => {
 
@@ -33,7 +35,7 @@ const Vendors = () => {
     
               return (
                 user && JSON.parse(user)?.role !== 'staff' &&
-                <div className='flex items-center gap-3'>
+                <div className='flex items-center gap-1'>
                     <Dialog>
                         <DialogTrigger asChild>
                             <Search 
@@ -45,7 +47,18 @@ const Vendors = () => {
                             <VendorReviewDashboard vendor={vnd} />
                         </DialogContent>
                     </Dialog>
-                    <div className='grid'>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <UserStar 
+                                className="h-4 w-4 cursor-pointer" 
+                            />
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogTitle></DialogTitle>
+                            <VendorRatingModal vendor={vnd} />
+                        </DialogContent>
+                    </Dialog>
+                    <div className='grid pl-4'>
                         <span className='text-xs text-muted-foreground'>
                         { vnd?.email}
                         </span>
@@ -94,6 +107,35 @@ const Vendors = () => {
                         }
                         </p>
                     </div>
+                );
+            },
+            enableSorting: true,
+            enableColumnFilter: true,
+        },
+        {
+            accessorKey: 'vendor_rating',
+            header: 'Rating',
+            cell: ({ row }) => {
+                const vnd = row.original;       
+                const limit = 5;     
+                return (
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <div 
+                                className='flex items-center gap-1 cursor-pointer'
+                            >
+                                {[...Array(limit)].map((_, i) => (
+                                    <BsStarFill key={i} 
+                                        className={`${i < vnd?.vendor_rating ? 'text-orange-400' : 'text-muted-foreground/20' }`} 
+                                    />
+                                ))}
+                            </div>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogTitle></DialogTitle>
+                            <VendorRatingModal vendor={vnd} />
+                        </DialogContent>
+                    </Dialog>
                 );
             },
             enableSorting: true,

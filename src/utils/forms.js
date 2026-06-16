@@ -809,6 +809,150 @@ export const vendorConsent = async (token, data, setSuccess, setError, setSubmit
     }
 };
 
+export const searchTrackingid = async (data, setSuccess, setError, setSearching) => {
+    setSearching(true);
+    try {
+        /**if (!token || typeof token !== "string") {
+            throw new Error("missing_token");
+        }*/
+        const response = await axios.post(`${API_BASE}/search-trackingid`, data, {
+            headers: {
+                Accept: "application/json",
+                // Remove Content-Type for GET — may trigger preflight unnecessarily
+                //Authorization: `Bearer ${token.trim()}`,
+            },
+            // withCredentials: true, // uncomment if the backend expects cookies
+        });
+        //console.log(response.data);
+        setSuccess(response.data);
+    } catch (err) {
+        if (err.message === "missing_token") {
+            setError("Authorization token not provided");
+        } else if (!err?.response) {
+            setError("No response from server");
+        } else {
+            // Prefer server message, normalize to string
+            const msg =
+            err.response.data?.message ||
+            err.response.data?.error ||
+            JSON.stringify(err.response.data) ||
+            `Request failed (${err.response.status})`;
+            console.log("Server response:", err.response);
+            setError(msg);
+        }
+    } finally {
+        setSearching(false);
+    }
+};
+
+export const submitProcurementRequest = async (data, setSuccess, setError, setSubmitting) => {
+    setSubmitting(true);
+    try {
+        /**if (!token || typeof token !== "string") {
+            throw new Error("missing_token");
+        }*/
+        const response = await axios.post(`${API_BASE}/procurement-request`, data, {
+            headers: {
+                Accept: "application/json",
+                // Remove Content-Type for GET — may trigger preflight unnecessarily
+                //Authorization: `Bearer ${token.trim()}`,
+            },
+            // withCredentials: true, // uncomment if the backend expects cookies
+        });
+        //console.log(response.data);
+        setSuccess(response.data);
+    } catch (err) {
+        if (err.message === "missing_token") {
+            setError("Authorization token not provided");
+        } else if (!err?.response) {
+            setError("No response from server");
+        } else {
+            // Prefer server message, normalize to string
+            const msg =
+            err.response.data?.message ||
+            err.response.data?.error ||
+            JSON.stringify(err.response.data) ||
+            `Request failed (${err.response.status})`;
+            console.log("Server response:", err.response);
+            setError(msg);
+        }
+    } finally {
+        setSubmitting(false);
+    }
+};
+
+export const getProcurementRequests = async (token, setRequests, setError, setFetching) => {
+    setFetching(true);
+    try {
+        if (!token || typeof token !== "string") {
+            throw new Error("missing_token");
+        }
+        const response = await axios.get(`${API_BASE}/procurement-requests`, {
+            headers: {
+                Accept: "application/json",
+                // Remove Content-Type for GET — may trigger preflight unnecessarily
+                Authorization: `Bearer ${token.trim()}`,
+            },
+            // withCredentials: true, // uncomment if the backend expects cookies
+        });
+        //console.log(response.data);
+        setRequests(response.data);
+    } catch (err) {
+        if (err.message === "missing_token") {
+            setError("Authorization token not provided");
+        } else if (!err?.response) {
+            setError("No response from server");
+        } else {
+            // Prefer server message, normalize to string
+            const msg =
+            err.response.data?.message ||
+            err.response.data?.error ||
+            JSON.stringify(err.response.data) ||
+            `Request failed (${err.response.status})`;
+            console.log("Server response:", err.response);
+            setError(msg);
+        }
+    } finally {
+        setFetching(false);
+    }
+};
+
+export const submitVendorRating = async (token, data, setSucces, setError, setSubmitting) => {
+    setSubmitting(true);
+    try {
+        if (!token || typeof token !== "string") {
+            throw new Error("missing_token");
+        }
+        const response = await axios.post(`${API_BASE}/rate-vendor`, data, {
+            headers: {
+                Accept: "application/json",
+                // Remove Content-Type for GET — may trigger preflight unnecessarily
+                Authorization: `Bearer ${token.trim()}`,
+            },
+            // withCredentials: true, // uncomment if the backend expects cookies
+        });
+        //console.log(response.data);
+        setSucces(response.data);
+    } catch (err) {
+        if (err.message === "missing_token") {
+            setError("Authorization token not provided");
+        } else if (!err?.response) {
+            setError("No response from server");
+        } else {
+            // Prefer server message, normalize to string
+            const msg =
+            err.response.data?.message ||
+            err.response.data?.error ||
+            JSON.stringify(err.response.data) ||
+            `Request failed (${err.response.status})`;
+            console.log("Server response:", err.response);
+            setError(msg);
+        }
+    } finally {
+        setSubmitting(false);
+    }
+};
+
 export const fetchFormFieldCategories = async (token, data, setCategories, setError, setLoading) => {
     setLoading(true);
     try {

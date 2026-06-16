@@ -86,7 +86,7 @@ const SignUp = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-background">
-            <div className="w-full grid grid-cols-1 lg:grid-cols-2 min-h-screen">
+            <div className="w-full z-30 grid grid-cols-1 lg:grid-cols-2 min-h-screen">
                 {/* Left Banner */}
                 <LeftBanner />
 
@@ -283,6 +283,7 @@ const SignUp = () => {
                     </div>
                 </div>
             </div>
+            <div className='w-full hidden md:block fixed top-0 h-screen m-0 bg-[url("/assets/req-bg1.png")] bg-contain opacity-10 dark:opacity-10'></div>
         </div>
     )
 }

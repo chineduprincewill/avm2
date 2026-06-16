@@ -7,7 +7,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Badge } from '../components/ui/badge';
 import LeftBanner from './left-banner';
-import { Eye, EyeOff } from 'lucide-react';
+import { BaggageClaim, Eye, EyeOff, LucideSettings, Settings2Icon } from 'lucide-react';
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import SubmitRequestDialog from './manage-requests/submit-request-dialog';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -69,7 +71,7 @@ const Login = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-background">
-            <div className="w-full grid grid-cols-1 lg:grid-cols-2 min-h-screen">
+            <div className="w-full z-30 grid grid-cols-1 lg:grid-cols-2 min-h-screen">
                 {/* Left Banner */}
                 <LeftBanner />
 
@@ -230,9 +232,17 @@ const Login = () => {
                             Privacy Policy
                         </a>
                         </p>
+                        <div 
+                            onClick={() => navigate('/manage-request')}
+                            className="w-full px-4 py-2 mt-4 bg-gradient-to-br from-accent to-brand hover:from-accent/80 hover:to-brand/80 cursor-pointer rounded-full flex items-center justify-center gap-1 shadow-xl text-nowrap text-blue-950">
+                            <BaggageClaim size={18} />
+                            {/**<LucideSettings size={14} />*/}
+                            <span>Procurement requests</span>
+                        </div>
                     </div>
                 </div>
             </div>
+            <div className='w-full hidden md:block fixed top-0 h-screen m-0 bg-[url("/assets/req-bg1.png")] bg-contain opacity-10 dark:opacity-10'></div>
         </div>
     );
 }

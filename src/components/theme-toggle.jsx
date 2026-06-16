@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Button } from './ui/button'
-import { LogOut, MailIcon, Moon, PhoneCallIcon, Sun } from 'lucide-react'
+import { MailIcon, Moon, Sun } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { fetchOrgData } from '../utils/users'
 import { AppContext } from '../context/AppContext'
@@ -45,11 +45,11 @@ const ThemeToggle = () => {
             <div className='p-2'></div>
             <div className='flex gap-2 items-center px-2 py-1'>
             {
-                path === '/' ?
+                path === '/' || path === '/manage-request' ?
                 <div className='flex gap-2 items-center'>
                     <div className='hidden md:flex gap-1 items-center font-extralight text-sm'>
                         <MailIcon size={14} />
-                        <span>services@apin.org.ng</span>
+                        <span>procurements@apin.org.ng</span>
                     </div>
                 </div> : 
                 <span className='text-sm'>

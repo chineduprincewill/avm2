@@ -8,7 +8,7 @@ import Dashboard from "./auth-pages/dashboard/Dashboard";
 import { TooltipProvider } from './components/ui/tooltip';
 import { Toaster as Sonner, Toaster } from "./components/ui/sonner"; 
 import DefaultLayout from "./auth-pages/layout/DefaultLayout";
-import Requests from "./auth-pages/forms/manage-forms";
+//import Requests from "./auth-pages/forms/manage-forms";
 import Reports from "./auth-pages/reports/reports";
 import Settings from "./auth-pages/settings/settings";
 import AppContextProvider from "./context/AppContext";
@@ -24,6 +24,8 @@ import UserRecords from "./auth-pages/user-records/user-records";
 import MedgemmaAi from "./public/medgemma-ai";
 import Registration from "./auth-pages/registration/registration";
 import Vendors from "./auth-pages/vendors/vendors";
+import RequestPage from "./public/manage-requests/request-page";
+import Requests from "./auth-pages/procurement-requests/requests";
 
 function App() {
 
@@ -49,6 +51,7 @@ function App() {
               <Routes>
                 <Route exact path="/" element={<Login />} />
                 <Route exact path="/signup" element={<SignUp />} />
+                <Route exact path="/manage-request" element={<RequestPage />} />
                 <Route exact path="/ai" element={<MedgemmaAi />} />
                 <Route element={<ProtectedRoute><DefaultLayout /></ProtectedRoute>}>
                     <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
@@ -59,7 +62,7 @@ function App() {
                     <Route path="/form-detail" element={<ProtectedRoute><FormDetail /></ProtectedRoute>} />
                     <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                     <Route path="/activity-log" element={<ProtectedRoute><Log /></ProtectedRoute>} />
-                    <Route path="/records" element={<ProtectedRoute><UserRecords /></ProtectedRoute>} />
+                    <Route path="/procurement-requests" element={<ProtectedRoute><Requests /></ProtectedRoute>} />
                     <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
                   </Route>
               </Routes>

@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '../../components/ui/dialog';
 import NotificationsDialog from '../notifications/notifications-dialog';
 import { FileSearchCorner, Settings, UserRoundCog } from 'lucide-react';
+import SkeletonComponent from '../../components/skeleton-component';
+import { statusColor } from '../../utils/functions';
 
 const SystemDashboard = () => {
 
@@ -163,7 +165,7 @@ const SystemDashboard = () => {
             </div>
 
             {/* Recent Activity */}
-            <div className="bg-card border border-border rounded-lg p-6">
+            <div className="bg-card border border-border rounded-lg p-6 mb-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div
                         className="bg-gray-100 dark:bg-gray-900 flex items-center justify-between h-auto py-3 px-4 rounded-md"
@@ -215,7 +217,53 @@ const SystemDashboard = () => {
                     </div>
                 </div>
             </div>
-    </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div className="bg-card border border-border rounded-lg p-6">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <p className="text-xl font-extralight text-muted-foreground mb-1">
+                            Procurement requests
+                            </p>
+                        </div>
+                        <div 
+                            className={`
+                                w-10 h-10 rounded-lg flex items-center justify-center
+                                ${statistics?.procurementRequestsStats?.find(pr => pr?.request_status === 'pending...')?.count > 0 ? 'bg-orange-300 border border-orange-700 dark:bg-orange-700 dark:border-orange-300' : 'bg-primary/10'}
+                            `}
+                        >
+                            <span className="text-2xl font-bold text-foreground">
+                            {
+                                fetching ? 
+                                <SvgLoader /> : 
+                                statistics?.procurementRequestsStats?.find(pr => pr?.request_status === 'pending...')?.count
+                            }
+                            </span>
+                        </div>
+                    </div>
+                    <div className='w-full grid gap-2 pt-4'>
+                    {
+                        fetching ? <SkeletonComponent /> : 
+                        statistics && statistics?.procurementRequestsStats.map((item, index) => (
+                            <div key={index} className='bg-gray-100 dark:bg-gray-900 flex items-center justify-between h-auto py-2 px-4 rounded-md'>
+                                <span className={`${statusColor(item?.request_status)}`}>{item?.request_status}</span>
+                                <span className='text-xl text-muted-foreground font-bold'>{item?.count}</span>
+                            </div>
+                        ))
+
+                    }
+                    </div>
+                    <div className='w-full flex justify-end'>
+                        <span 
+                            className="text-xs text-muted-foreground hover:bg-muted-foreground/20 mt-4 cursor-pointer px-2 py-1 rounded-md"
+                            onClick={() => navigate('/procurement-requests')}
+                        >
+                            click for detail...
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
     )
 }
 

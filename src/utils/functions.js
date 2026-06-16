@@ -30,9 +30,13 @@ export const getConditionLabel = (code) => {
 
 export const statusColor = (stat) => {
     switch(stat) {
-        case 'Active':
+        case 'pending...':
+            return 'text-orange-500';
+        case 'processing...':
+            return 'text-brand';
+        case 'completed...':
             return 'text-green-500';
-        case 'Disabled':
+        case 'declined...':
             return 'text-red-500';
         default:
             return 'text-red-500';
@@ -125,4 +129,14 @@ export const replaceCharsWithSpace = (str, charsArray) => {
     
     // Replace matching characters with space
     return str.replace(regex, ' ');
+}
+
+export const removeDuplicateSentences = (text) => {
+    // Split by periods, question marks, exclamation marks
+    let sentences = text.split(/(?<=[.!?])\s+/);
+    
+    // Remove duplicates while preserving order
+    let uniqueSentences = [...new Set(sentences)];
+    
+    return uniqueSentences.join(' ');
 }

@@ -1,30 +1,35 @@
-import { CheckCircle2Icon, CircleQuestionMarkIcon, SearchIcon } from 'lucide-react';
-import React, { useContext, useState } from 'react'
+import { CheckCircle2Icon, CircleQuestionMarkIcon } from 'lucide-react';
+import React, { useContext, useEffect, useState } from 'react'
 import Dropzone from 'shadcn-dropzone';
 import { fileUpload } from '../utils/forms';
 import { AppContext } from '../context/AppContext';
 import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
+import DocumentVerificationComponent from '../auth-pages/registration/document-verification-component';
 
-const FileUploadComponent = ({ doc }) => {
+const FileUploadComponent = ({ doc, fields }) => {
 
     const { token } = useContext(AppContext);
     const [success, setSuccess] = useState();
     const [error, setError] = useState();
     const [uploading, setUploading] = useState(false);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [docToVerify, setDocToVerify] = useState();
+    const [verified, setVerified] = useState(0)
+    const [uploadData, setUploadData] = useState();
 
     const handleFileDrop = (acceptedFiles) => {
+        setIsDialogOpen(true);
         // This function is called when files are dropped or selected
-        console.log("Files received:", acceptedFiles);
+        //console.log("Files received:", acceptedFiles);
+        setDocToVerify(acceptedFiles[0]);
         
         // Example: Add your API call logic here
         const formData = new FormData();
         formData.append('file', acceptedFiles[0]);
         formData.append('document_type', doc?.label);
         // axios.post('/api/upload', formData);
-
-        console.log(formData);
-
-        fileUpload(token, formData, setSuccess, setError, setUploading)
+        setUploadData(formData);
     };
 
     if(success){
@@ -32,7 +37,6 @@ const FileUploadComponent = ({ doc }) => {
             className: "!bg-green-700 !text-white !border-white !font-bold",
             descriptionClassName: "!text-green-700",
         })
-        //window.location.reload();
     }
 
     if(error){
@@ -40,7 +44,23 @@ const FileUploadComponent = ({ doc }) => {
             className: "!bg-red-700 !text-white !border-white !font-bold",
             descriptionClassName: "!text-red-700",
         });
+        setError();
     }
+
+    useEffect(() => {
+        if(verified === 'matched'){
+            fileUpload(token, uploadData, setSuccess, setError, setUploading)
+            setIsDialogOpen(false)
+            setVerified();
+            //setVerified(0)
+        }
+        else if(verified === 'not matched'){
+            setError('Document verification failed!')
+            setIsDialogOpen(false)
+            setVerified();
+        }
+        
+    }, [verified])
     
     return (
     <div className="space-y-4">
@@ -81,6 +101,19 @@ const FileUploadComponent = ({ doc }) => {
             </div>
         )}
         </Dropzone>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle></DialogTitle>
+                </DialogHeader>
+                <DocumentVerificationComponent 
+                    docToVerify={docToVerify} 
+                    setVerified={setVerified} 
+                    document={doc} 
+                    fields={fields}
+                />
+            </DialogContent>
+        </Dialog>
     </div>
     );
 }

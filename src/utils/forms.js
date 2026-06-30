@@ -355,7 +355,7 @@ export const getVendorDashboardStatistics = async (token, setStatistics, setErro
             },
             // withCredentials: true, // uncomment if the backend expects cookies
         });
-        console.log(response.data);
+        //console.log(response.data);
         setStatistics(response.data);
     } catch (err) {
         if (err.message === "missing_token") {
@@ -374,6 +374,102 @@ export const getVendorDashboardStatistics = async (token, setStatistics, setErro
         }
     } finally {
         setFetching(false);
+    }
+};
+
+export const getAdminRegistrationDocuments = async (token, setDocuments, setError, setFetching) => {
+    setFetching(true);
+    try {
+        const response = await axios.get(`${API_BASE}/registration-documents`, {
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${token.trim()}`,
+            },
+            // withCredentials: true, // uncomment if the backend expects cookies
+        });
+        //console.log(response.data);
+        setDocuments(response.data);
+    } catch (err) {
+        if (!err?.response) {
+            setError("No response from server");
+        } else {
+            // Prefer server message, normalize to string
+            const msg =
+            err.response.data?.message ||
+            err.response.data?.error ||
+            JSON.stringify(err.response.data) ||
+            `Request failed (${err.response.status})`;
+            console.log("Server response:", err.response);
+            setError(msg);
+        }
+    } finally {
+        setFetching(false);
+    }
+};
+
+export const getAdminRegistrationFormfields = async (token, setList, setError, setFetching) => {
+    setFetching(true);
+    try {
+        const response = await axios.get(`${API_BASE}/registration-formfields`, {
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${token.trim()}`,
+            },
+            // withCredentials: true, // uncomment if the backend expects cookies
+        });
+        //console.log(response.data);
+        setList(response.data);
+    } catch (err) {
+        if (!err?.response) {
+            setError("No response from server");
+        } else {
+            // Prefer server message, normalize to string
+            const msg =
+            err.response.data?.message ||
+            err.response.data?.error ||
+            JSON.stringify(err.response.data) ||
+            `Request failed (${err.response.status})`;
+            console.log("Server response:", err.response);
+            setError(msg);
+        }
+    } finally {
+        setFetching(false);
+    }
+};
+
+export const updateDocumentValidationRule = async (token, data, setSuccess, setError, setUpdating) => {
+    setUpdating(true);
+    try {
+        if (!token || typeof token !== "string") {
+            throw new Error("missing_token");
+        }
+        const response = await axios.post(`${API_BASE}/update-document-validation-rule`, data, {
+            headers: {
+                Accept: "application/json",
+                // Remove Content-Type for GET — may trigger preflight unnecessarily
+                Authorization: `Bearer ${token.trim()}`,
+            },
+            // withCredentials: true, // uncomment if the backend expects cookies
+        });
+        //console.log(response.data);
+        setSuccess(response.data);
+    } catch (err) {
+        if (err.message === "missing_token") {
+            setError("Authorization token not provided");
+        } else if (!err?.response) {
+            setError("No response from server");
+        } else {
+            // Prefer server message, normalize to string
+            const msg =
+            err.response.data?.message ||
+            err.response.data?.error ||
+            JSON.stringify(err.response.data) ||
+            `Request failed (${err.response.status})`;
+            console.log("Server response:", err.response);
+            setError(msg);
+        }
+    } finally {
+        setUpdating(false);
     }
 };
 
@@ -924,6 +1020,42 @@ export const submitVendorRating = async (token, data, setSucces, setError, setSu
             throw new Error("missing_token");
         }
         const response = await axios.post(`${API_BASE}/rate-vendor`, data, {
+            headers: {
+                Accept: "application/json",
+                // Remove Content-Type for GET — may trigger preflight unnecessarily
+                Authorization: `Bearer ${token.trim()}`,
+            },
+            // withCredentials: true, // uncomment if the backend expects cookies
+        });
+        //console.log(response.data);
+        setSucces(response.data);
+    } catch (err) {
+        if (err.message === "missing_token") {
+            setError("Authorization token not provided");
+        } else if (!err?.response) {
+            setError("No response from server");
+        } else {
+            // Prefer server message, normalize to string
+            const msg =
+            err.response.data?.message ||
+            err.response.data?.error ||
+            JSON.stringify(err.response.data) ||
+            `Request failed (${err.response.status})`;
+            console.log("Server response:", err.response);
+            setError(msg);
+        }
+    } finally {
+        setSubmitting(false);
+    }
+};
+
+export const proceedToSubgrouping = async (token, data, setSucces, setError, setSubmitting) => {
+    setSubmitting(true);
+    try {
+        if (!token || typeof token !== "string") {
+            throw new Error("missing_token");
+        }
+        const response = await axios.post(`${API_BASE}/process-subgrouping`, data, {
             headers: {
                 Accept: "application/json",
                 // Remove Content-Type for GET — may trigger preflight unnecessarily

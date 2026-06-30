@@ -4,7 +4,7 @@ import FileUploadComponent from '../../components/file-upload-component'
 import { File, FileSearchCorner } from 'lucide-react'
 import { AppContext } from '../../context/AppContext'
 
-const FileUpload = ({ item }) => {
+const FileUpload = ({ item, formfields }) => {
 
     const { user } = useContext(AppContext);
 
@@ -15,7 +15,7 @@ const FileUpload = ({ item }) => {
             <CardHeader>
                 <CardTitle className='border-b pb-2 font-extralight leading-normal'>
                     <div className='flex items-center justify-between'>
-                        <span>{item?.label}</span>
+                        <span>{item?.required === 1 && <span className='text-red-600 font-bold text-lg'>*</span>} {item?.label}</span>
                     {
                         item?.file_path !== null && 
                         <a href={import.meta.env.VITE_DOWNLOAD_URL+item?.file_path} download={item?.label} target='_blank'> 
@@ -31,7 +31,7 @@ const FileUpload = ({ item }) => {
         {
             user && JSON.parse(user)?.category === 'vendor' &&
             <CardContent className='text-accent text-sm'>
-                <FileUploadComponent doc={item} />
+                <FileUploadComponent doc={item} fields={formfields} />
             </CardContent>
         }
         </Card>

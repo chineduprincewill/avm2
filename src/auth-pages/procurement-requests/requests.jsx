@@ -14,7 +14,7 @@ import ProcessReqests from './process-requests';
 
 const Requests = () => {
 
-    const { token } = useContext(AppContext);
+    const { token, record } = useContext(AppContext);
     const [requests, setRequests] = useState();
     const [error, setError] = useState();
     const [fetching, setFetching] = useState(false);
@@ -89,7 +89,7 @@ const Requests = () => {
 
     useEffect(() => {
         getProcurementRequests(token, setRequests, setError, setFetching)
-    }, [])
+    }, [record])
 
 
 

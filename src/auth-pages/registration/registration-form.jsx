@@ -1,4 +1,4 @@
-import { ChevronDownIcon, CircleArrowLeft, CircleArrowRight, CircleX } from 'lucide-react'
+import { AlertCircle, ChevronDownIcon, CircleArrowLeft, CircleArrowRight, CircleX } from 'lucide-react'
 import React, { useContext, useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth';
 import { addVendorRegistrationData, fetchFormfields } from '../../utils/forms';
@@ -280,6 +280,10 @@ const RegistrationForm = ({ active, setActive, status }) => {
                     />
                     <span>Close form</span>
                 </div>
+            </div>
+            <div className='flex items-center gap-4 p-2 border border-orange-500 rounded-lg'>
+                <AlertCircle size={50} className='text-orange-600' />
+                <span className='text-orange-600 text-lg'>Please ensure that the information you provide here aligns perfectly with the contents of any associated document to be uploaded.</span>
             </div>
         {
             fetching ? <SkeletonComponent /> :

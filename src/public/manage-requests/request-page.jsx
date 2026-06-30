@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Input } from '../../components/ui/input'
-import { CloudUpload, MoveLeft, Search } from 'lucide-react'
+import { CloudUpload, Home, MoveLeft, Search } from 'lucide-react'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { directorates } from '../../lib/data';
 import FileUploadComponent from '../../components/file-upload-component';
@@ -116,10 +116,11 @@ const RequestPage = () => {
         <div className='flex justify-center bg-background p-4'>
             <div className='w-full z-30 grid gap-4 md:w-2/3 my-4'>
                 <div className='grid gap-0'>
-                    <a href='/'>
-                        <MoveLeft size={50} className='text-brand' />
+                    <a href='/' className='max-w-max px-4 py-2 bg-card dark:border dark:border-brand rounded-xl flex items-center gap-1 text-brand shadow-xl'>
+                        <Home size={16} />
+                        <span>Back to Home</span>
                     </a>
-                    <span className='text-4xl md:text-7xl font-extralight text-brand mt-[-10px]'>
+                    <span className='text-4xl md:text-7xl font-extralight text-brand mt-[-5px]'>
                         Submit and track your requests
                     </span>
                 </div>

@@ -14,7 +14,7 @@ const RegistrationStatus = ({ status, active, setActive }) => {
                 <span className='text-muted-foreground'>Registration status</span>
                 <span className='text-xl md:text-4xl font-extralight text-accent capitalize'>
                     {status && 
-                    (status?.vendor?.status === 'registration started' && status?.registration_percentage > 75 && status?.upload_percentage > 49 ? 'awaiting scoring' : status?.vendor?.status)}
+                    (status?.vendor?.status === 'registration started' && status?.registration_percentage > 75 && status?.uploaded_all_required_docs === 1 ? 'awaiting scoring' : status?.vendor?.status)}
                 </span>
                 <div className='mt-4'>
                     <ProgressComponent limit={status?.registration_percentage} />
@@ -35,7 +35,7 @@ const RegistrationStatus = ({ status, active, setActive }) => {
                         {
                             user && JSON.parse(user)?.category === 'system' ? 
                             (active === 'record' ? 'View registration data' : 'View document uploads') :
-                            (status?.registration_percentage > 0 ? 'Continue registration' : 'Start registration')
+                            (status?.registration_percentage > 0 ? (active === 'record' ? 'Continue registration' : 'View uploaded documents') : 'Start registration')
                         }
                         </span>
                     </div>

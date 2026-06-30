@@ -8,17 +8,21 @@ import RegistrationConsentComponent from './registration-consent-component';
 
 const Registration = () => {
 
-    const { token } = useContext(AppContext);
+    const { token, logout } = useContext(AppContext);
     const [status, setStatus] = useState();
     const [fetching, setFetching] = useState(false);
     const [error, setError] = useState();
     const [active, setActive] = useState('record');
 
+    if(status && status?.status === 'Token is Expired'){
+        logout
+    }
+
     useEffect(() => {
         getVendorRegistrationStatus(token, setStatus, setError, setFetching)
     }, [])
 
-    console.log(status);
+    //console.log(status);
 
     return (
         <div className='p-6 grid gap-4'>
@@ -26,7 +30,7 @@ const Registration = () => {
             <div className='bg-card border border-border rounded-lg p-6 gap-4'>
             {
                 active === 'record' ?
-                <RegistationRecord regStatus={status} /> : 
+                <RegistationRecord regStatus={status} setActive={setActive} /> : 
                 (
                     status && status?.vendor_consent !== null ?
                     <RegistrationForm active={active} setActive={setActive} status={status?.vendor?.status} />

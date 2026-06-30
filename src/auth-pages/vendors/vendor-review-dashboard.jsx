@@ -51,7 +51,7 @@ const VendorReviewDashboard = ({ vendor }) => {
             </DialogFooter>
 
             {
-                (status?.registration_percentage > 75 && status?.upload_percentage > 49) &&
+                (status?.registration_percentage > 75 && status?.uploaded_all_required_docs === 1) &&
                 <div className='sticky bottom-0 flex justify-end z-40'>
                     <Dialog>
                         <DialogTrigger asChild>

@@ -4,10 +4,11 @@ import { AppContext } from '../../context/AppContext'
 import { getNofifications, readNofification } from '../../utils/forms'
 import SkeletonComponent from '../../components/skeleton-component'
 import { capitalizeFirstWord, formatDateAndTime } from '../../utils/functions'
+import ProfileUpdateNotificationMessage from './profile-update-notification-message'
 
 const NotificationsDialog = () => {
 
-    const { token, refreshRecord } = useContext(AppContext);
+    const { token, record, refreshRecord } = useContext(AppContext);
     const [notifications, setNotifications] = useState();
     const [error, setError] = useState();
     const [fetching, setFetching] = useState(false);
@@ -33,7 +34,7 @@ const NotificationsDialog = () => {
 
     useEffect(() => {
         getNofifications(token, setNotifications, setError, setFetching)
-    }, [])
+    }, [record])
 
     return (
         <DialogContent className="w-[75vw] h-[75vh] !max-w-none">
@@ -44,7 +45,7 @@ const NotificationsDialog = () => {
                 </DialogDescription>
             </DialogHeader>
             <div className='w-full grid grid-cols-3'>
-                    <div className='col-span-1 p-2 overflow-y-auto'>
+                    <div className='col-span-1 px-2 py-4 h-[60vh] overflow-y-scroll'>
                     {
                         fetching ? <SkeletonComponent /> :
                         notifications && notifications?.length > 0 ? 
@@ -67,13 +68,23 @@ const NotificationsDialog = () => {
                         </span>
                     }
                     </div>
-                    <div className='col-span-2 h-[60vh]'>
+                    <div className='col-span-2 h-[60vh] overflow-y-scroll'>
                     {
                         notification &&
                         <div className='w-full grid gap-0 p-2 md:p-4 border border-border rounded-md'>
                             <span className='text-muted-foreground'>from {notification?.sender}</span>
                             <h1 className='text-2xl font-extralight pb-2 border-b border-border'>{capitalizeFirstWord(notification?.resource.replaceAll('_', ' '))}</h1>
-                            <div className='my-4 text-lg'>{notification?.message}</div>
+                            <div className='my-4 text-lg'>
+                            {
+                                notification?.resource === 'Profile Update' ?
+                                <ProfileUpdateNotificationMessage
+                                    notification_id={notification?.id}
+                                    sender={notification?.sender} 
+                                    message={notification?.message} 
+                                /> :
+                                notification?.message
+                            }
+                            </div>
                             <div className='w-full flex justify-end'>
                                 <span className='text-muted-foreground'>{formatDateAndTime(notification?.created_at)}</span>
                             </div>

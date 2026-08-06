@@ -41,7 +41,7 @@ const RequestDataTable = ({ requestData, onItemUpdate, onItemAction, updatedRequ
     
     // State for additional fields
     const [additionalData, setAdditionalData] = useState(
-        initialItems.map(() => ({
+        Array.isArray(initialItems) && initialItems.map(() => ({
         estimatedCost: '',
         serviceScope: '',
         }))
@@ -123,7 +123,7 @@ const RequestDataTable = ({ requestData, onItemUpdate, onItemAction, updatedRequ
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {initialItems.map((item, index) => (
+                    {Array.isArray(initialItems) && initialItems.map((item, index) => (
                     <TableRow key={index}>
                         <TableCell className="font-medium text-muted-foreground">
                         {item['S/N']}

@@ -353,6 +353,78 @@ export const updatePassword = async (token, data, setSuccess, setError, setUpdat
     }
 };
 
+export const updateProfile = async (token, data, setSuccess, setError, setUpdating) => {
+    setUpdating(true);
+    try {
+        if (!token || typeof token !== "string") {
+            throw new Error("missing_token");
+        }
+        const response = await axios.post(`${API_BASE}/update-profile`, data, {
+            headers: {
+                Accept: "application/json",
+                // Remove Content-Type for GET — may trigger preflight unnecessarily
+                Authorization: `Bearer ${token.trim()}`,
+            },
+            // withCredentials: true, // uncomment if the backend expects cookies
+        });
+        console.log(response.data);
+        setSuccess(response.data);
+    } catch (err) {
+        if (err.message === "missing_token") {
+            setError("Authorization token not provided");
+        } else if (!err?.response) {
+            setError("No response from server");
+        } else {
+            // Prefer server message, normalize to string
+            const msg =
+            err.response.data?.message ||
+            err.response.data?.error ||
+            JSON.stringify(err.response.data) ||
+            `Request failed (${err.response.status})`;
+            console.log("Server response:", err.response);
+            setError(msg);
+        }
+    } finally {
+        setUpdating(false);
+    }
+};
+
+export const updateProfileRequestAction = async (token, data, setSuccess, setError, setApproving) => {
+    setApproving(true);
+    try {
+        if (!token || typeof token !== "string") {
+            throw new Error("missing_token");
+        }
+        const response = await axios.post(`${API_BASE}/update-profile-request-action`, data, {
+            headers: {
+                Accept: "application/json",
+                // Remove Content-Type for GET — may trigger preflight unnecessarily
+                Authorization: `Bearer ${token.trim()}`,
+            },
+            // withCredentials: true, // uncomment if the backend expects cookies
+        });
+        console.log(response.data);
+        setSuccess(response.data);
+    } catch (err) {
+        if (err.message === "missing_token") {
+            setError("Authorization token not provided");
+        } else if (!err?.response) {
+            setError("No response from server");
+        } else {
+            // Prefer server message, normalize to string
+            const msg =
+            err.response.data?.message ||
+            err.response.data?.error ||
+            JSON.stringify(err.response.data) ||
+            `Request failed (${err.response.status})`;
+            console.log("Server response:", err.response);
+            setError(msg);
+        }
+    } finally {
+        setApproving(false);
+    }
+};
+
 
 export const fetchActivityLog = async ( token, setLog, setError, setLoading ) => {
 
@@ -528,3 +600,210 @@ export const getUserRecords = async (token, setRecords, setError, setFetching) =
     }
 };
 
+export const newDirectorate = async (token, data, setSuccess, setError, setSubmitting) => {
+    setSubmitting(true);
+    try {
+        if (!token || typeof token !== "string") {
+            throw new Error("missing_token");
+        }
+        const response = await axios.post(`${API_BASE}/add-directorate`, data, {
+            headers: {
+                Accept: "application/json",
+                // Remove Content-Type for GET — may trigger preflight unnecessarily
+                Authorization: `Bearer ${token.trim()}`,
+            },
+            // withCredentials: true, // uncomment if the backend expects cookies
+        });
+        console.log(response.data);
+        setSuccess(response.data);
+    } catch (err) {
+        if (err.message === "missing_token") {
+            setError("Authorization token not provided");
+        } else if (!err?.response) {
+            setError("No response from server");
+        } else {
+            // Prefer server message, normalize to string
+            const msg =
+            err.response.data?.message ||
+            err.response.data?.error ||
+            JSON.stringify(err.response.data) ||
+            `Request failed (${err.response.status})`;
+            console.log("Server response:", err.response);
+            setError(msg);
+        }
+    } finally {
+        setSubmitting(false);
+    }
+};
+
+export const fetchAdminDirectorates = async (token, setDirectorates, setError, setFetching) => {
+    setFetching(true);
+    try {
+        if (!token || typeof token !== "string") {
+            throw new Error("missing_token");
+        }
+        const response = await axios.get(`${API_BASE}/admin-directorates`, {
+            headers: {
+                Accept: "application/json",
+                // Remove Content-Type for GET — may trigger preflight unnecessarily
+                Authorization: `Bearer ${token.trim()}`,
+            },
+            // withCredentials: true, // uncomment if the backend expects cookies
+        });
+        console.log(response.data);
+        setDirectorates(response.data);
+    } catch (err) {
+        if (err.message === "missing_token") {
+            setError("Authorization token not provided");
+        } else if (!err?.response) {
+            setError("No response from server");
+        } else {
+            // Prefer server message, normalize to string
+            const msg =
+            err.response.data?.message ||
+            err.response.data?.error ||
+            JSON.stringify(err.response.data) ||
+            `Request failed (${err.response.status})`;
+            console.log("Server response:", err.response);
+            setError(msg);
+        }
+    } finally {
+        setFetching(false);
+    }
+};
+
+export const fetchDirectorates = async (setDirectorates, setError, setFetching) => {
+    setFetching(true);
+    try {
+        const response = await axios.get(`${API_BASE}/directorates`, {
+            headers: {
+                Accept: "application/json",
+            },
+            // withCredentials: true, // uncomment if the backend expects cookies
+        });
+        console.log(response.data);
+        setDirectorates(response.data);
+    } catch (err) {
+        if (err.message === "missing_token") {
+            setError("Authorization token not provided");
+        } else if (!err?.response) {
+            setError("No response from server");
+        } else {
+            // Prefer server message, normalize to string
+            const msg =
+            err.response.data?.message ||
+            err.response.data?.error ||
+            JSON.stringify(err.response.data) ||
+            `Request failed (${err.response.status})`;
+            console.log("Server response:", err.response);
+            setError(msg);
+        }
+    } finally {
+        setFetching(false);
+    }
+};
+
+export const newUnit = async (token, data, setSuccess, setError, setSubmitting) => {
+    setSubmitting(true);
+    try {
+        if (!token || typeof token !== "string") {
+            throw new Error("missing_token");
+        }
+        const response = await axios.post(`${API_BASE}/add-unit`, data, {
+            headers: {
+                Accept: "application/json",
+                // Remove Content-Type for GET — may trigger preflight unnecessarily
+                Authorization: `Bearer ${token.trim()}`,
+            },
+            // withCredentials: true, // uncomment if the backend expects cookies
+        });
+        console.log(response.data);
+        setSuccess(response.data);
+    } catch (err) {
+        if (err.message === "missing_token") {
+            setError("Authorization token not provided");
+        } else if (!err?.response) {
+            setError("No response from server");
+        } else {
+            // Prefer server message, normalize to string
+            const msg =
+            err.response.data?.message ||
+            err.response.data?.error ||
+            JSON.stringify(err.response.data) ||
+            `Request failed (${err.response.status})`;
+            console.log("Server response:", err.response);
+            setError(msg);
+        }
+    } finally {
+        setSubmitting(false);
+    }
+};
+
+export const fetchAdminUnits = async (token, setUnits, setError, setFetching) => {
+    setFetching(true);
+    try {
+        if (!token || typeof token !== "string") {
+            throw new Error("missing_token");
+        }
+        const response = await axios.get(`${API_BASE}/admin-units`, {
+            headers: {
+                Accept: "application/json",
+                // Remove Content-Type for GET — may trigger preflight unnecessarily
+                Authorization: `Bearer ${token.trim()}`,
+            },
+            // withCredentials: true, // uncomment if the backend expects cookies
+        });
+        console.log(response.data);
+        setUnits(response.data);
+    } catch (err) {
+        if (err.message === "missing_token") {
+            setError("Authorization token not provided");
+        } else if (!err?.response) {
+            setError("No response from server");
+        } else {
+            // Prefer server message, normalize to string
+            const msg =
+            err.response.data?.message ||
+            err.response.data?.error ||
+            JSON.stringify(err.response.data) ||
+            `Request failed (${err.response.status})`;
+            console.log("Server response:", err.response);
+            setError(msg);
+        }
+    } finally {
+        setFetching(false);
+    }
+};
+
+
+export const fetchUnits = async (data, setUnits, setError, setFetching) => {
+    setFetching(true);
+    try {
+        const response = await axios.post(`${API_BASE}/units`, data, {
+            headers: {
+                Accept: "application/json",
+                // Remove Content-Type for GET — may trigger preflight unnecessarily
+            },
+            // withCredentials: true, // uncomment if the backend expects cookies
+        });
+        console.log(response.data);
+        setUnits(response.data);
+    } catch (err) {
+        if (err.message === "missing_token") {
+            setError("Authorization token not provided");
+        } else if (!err?.response) {
+            setError("No response from server");
+        } else {
+            // Prefer server message, normalize to string
+            const msg =
+            err.response.data?.message ||
+            err.response.data?.error ||
+            JSON.stringify(err.response.data) ||
+            `Request failed (${err.response.status})`;
+            console.log("Server response:", err.response);
+            setError(msg);
+        }
+    } finally {
+        setFetching(false);
+    }
+};

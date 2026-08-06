@@ -17,6 +17,8 @@ const Accounts = () => {
     const [error, setError] = useState();
     const [loading, setLoading] = useState(false);
 
+    console.log(JSON.parse(user))
+
     const columns = [
         {
             accessorKey: 'username',
@@ -157,7 +159,7 @@ const Accounts = () => {
                 <div className='w-full flex p-6 justify-between items-center bg-card rounded-lg'>
                     <span className='text-xl font-extralight'>Accounts</span>
                 {
-                    user && JSON.parse(user)?.role === 'admin' &&
+                    (user && JSON.parse(user)?.category === 'system' && JSON.parse(user)?.role === 'admin') &&
                     <Dialog>
                         <DialogTrigger asChild>
                             <Button

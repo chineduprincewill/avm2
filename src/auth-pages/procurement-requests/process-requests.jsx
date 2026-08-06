@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../components/ui/dialog'
 import { Button } from '../../components/ui/button'
 import RequestDataDisplay from './request-data-display'
@@ -6,15 +6,18 @@ import { formatDateAndTime } from '../../utils/functions'
 import ScopedDataDisplay from './scoped-data-display'
 import { AppContext } from '../../context/AppContext'
 import { toast } from 'sonner'
-import { proceedToSubgrouping } from '../../utils/forms'
+import { getProcurementRequestDocuments, proceedToSubgrouping } from '../../utils/forms'
+import { File } from 'lucide-react'
 
 const ProcessReqests = ({ req }) => {
 
     const { token, refreshRecord } = useContext(AppContext);
     const [updatedRequestData, setUpdatedRequestData] = useState([]);
+    const [documents, setDocuments] = useState();
     const [success, setSuccess] = useState();
     const [error, setError] = useState();
     const [submitting, setSubmitting] = useState(false);
+    const [fetching, setFetching] = useState(false);
     
     const handleItemUpdate = (index, data) => {
         console.log(`Item ${index} updated:`, data);
@@ -68,14 +71,42 @@ const ProcessReqests = ({ req }) => {
         setError();
     }
 
+    useEffect(() => {
+        getProcurementRequestDocuments(token, { trackingid:req?.trackingid }, setDocuments, setError, setFetching)
+    }, [])
+
     return (
         <DialogContent className="w-[95vw] max-h-[95vh] overflow-y-auto !max-w-none">
             <DialogHeader>
                 <DialogTitle className="text-2xl font-extralight">#{req?.trackingid} - {formatDateAndTime(req?.created_at)}</DialogTitle>
                 <DialogDescription className="grid gap-1">
-                    <span>{req?.request_title}</span>
-                    <span>From - {req?.unit}, {req?.directorate}</span>
-                    <span>By - {req?.email}</span>
+                    <div className='grid grid-cols-3'>
+                        <div className='col-span-1 grid'>
+                            <span>Title - {req?.request_title}</span>
+                            <span>From - {req?.unit}, {req?.directorate}</span>
+                            <span>By - {req?.email}</span>
+                            <span>Project - {req?.projectname}</span>
+                        </div>
+                        <div className='col-span-2 grid'>
+                            <span>Budget line item - {req?.budgetLineItem}</span>
+                            <span>Grant - {req?.grantname}</span>
+                            <span>Code - {req?.grantcode}</span>
+                            <div className='flex items-center gap-4 mt-2'>
+                                <span>Attachments -</span>
+                                    {
+                                        fetching ? <span className='italic'>loading documents...</span> :
+                                        (
+                                            documents && documents.length > 0 ? documents.map(doc => (
+                                                <div key={doc?.id} className='flex gap-1 items-center'>
+                                                    <a href={import.meta.env.VITE_DOWNLOAD_URL+doc?.document_filepath} download={doc?.document_title} target='_blank'><File className='w-4 h-4' /></a>
+                                                    <span>{doc?.document_title}</span>
+                                                </div>
+                                            )) : <span className='text-muted-foreground'>No document attached</span>
+                                        )
+                                    }
+                            </div>
+                        </div>
+                    </div>
                 </DialogDescription>
             </DialogHeader>
             <div className='w-full'>

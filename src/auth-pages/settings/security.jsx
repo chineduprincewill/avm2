@@ -16,16 +16,20 @@ import OfficeLocationUpdate from './office-location-update';
 import { Alert, AlertTitle } from '../../components/ui/alert';
 import { InfoIcon, LucideMinus, LucidePlus } from 'lucide-react';
 import DocumentsValidationSettings from './documents-validation-settings';
+import ManageDirectorates from './manage-directorates';
+import ManageUnits from './manage-units';
 
 const Security = () => {
 
-    const { token, user } = useContext(AppContext);
+    const { token, user, record } = useContext(AppContext);
     const [profile, setProfile] = useState();
     const [error, setError] = useState()
     const [loading, setLoading] = useState(false);
     const [showprofile, setShowprofile] = useState(false);
     const [passwordupdate, setPasswordupdate] = useState(false);
     const [docConf, setDocConf] = useState(false);
+    const [showDirectorates, setShowDirectorates] = useState(false);
+    const [showUnits, setShowUnits] = useState(false);
 
     const usr = user && JSON.parse(user);
 
@@ -41,9 +45,17 @@ const Security = () => {
         setDocConf(!docConf)
     }
 
+    const toggleDirectorate = () => {
+        setShowDirectorates(!showDirectorates)
+    }
+
+    const toggleUnits = () => {
+        setShowUnits(!showUnits)
+    }
+
     useEffect(() => {
         fetchUserProfile(token, setProfile, setError, setLoading)
-    }, [])
+    }, [record])
 
     return (
         <div className='w-full mt-4 grid gap-6'>
@@ -68,7 +80,10 @@ const Security = () => {
                                 </div>
                             </CardTitle>
                             <CardDescription>
-                            Below is your profile information
+                            Below is your profile information. 
+                            {
+                                usr && usr?.category === 'vendor' && 'You can update your username, email and phone no. However, it will only reflect on admin approval'
+                            }
                             </CardDescription>
                         </CardHeader>
                         <CardContent
@@ -138,6 +153,65 @@ const Security = () => {
                         <DocumentsValidationSettings />
                     </CardContent>
                 </Card>
+                </div>
+            }
+            {
+                (usr?.category === 'system' && usr?.role === 'admin') &&
+                <div className='w-full grid md:flex md:justify-between md:items-start gap-4'>
+                    <div className='w-full md:w-[49%]'>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex justify-between items-center">
+                                    <span>Directorate</span>
+                                    <div 
+                                        className='cursor-pointer'
+                                        onClick={() => toggleDirectorate()}
+                                    >
+                                    {
+                                        showDirectorates ? 
+                                            <LucideMinus /> :
+                                            <LucidePlus />
+                                    }
+                                    </div>
+                                </CardTitle>
+                                <CardDescription>
+                                    Manage your directorates. 
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent
+                                className={`${showDirectorates ? 'block' : 'hidden'}`}
+                            >
+                                <ManageDirectorates />
+                            </CardContent>
+                        </Card>
+                    </div>
+                    <div className='grid gap-4 w-full md:w-[49%]'>
+                        <Card>
+                            <CardHeader>
+                            <CardTitle className="flex justify-between items-center">
+                                    <span>Units</span>
+                                    <div 
+                                        className='cursor-pointer'
+                                        onClick={() => toggleUnits()}
+                                    >
+                                    {
+                                        showUnits ? 
+                                            <LucideMinus /> :
+                                            <LucidePlus />
+                                    }
+                                    </div>
+                                </CardTitle>
+                                <CardDescription>
+                                    Manage your Units. 
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent
+                                className={`${showUnits ? 'block' : 'hidden'}`}
+                            >
+                                <ManageUnits />
+                            </CardContent>
+                        </Card>
+                    </div>
                 </div>
             }
         </div>

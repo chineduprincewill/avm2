@@ -143,7 +143,6 @@ export async function verifyPdf (docToVerify, matchValue, setUpdate) {
 export function checkStringsExist(array, targetString) {
     const lowerTarget = targetString.toLowerCase();
     let res = 0
-    
     // Return 1 immediately if any item is missing
     if(array.length > 0){
         for (const item of array) {

@@ -140,3 +140,13 @@ export const removeDuplicateSentences = (text) => {
     
     return uniqueSentences.join(' ');
 }
+
+
+export const appendArrayToFormData = (formData, array, name) => {
+    array.forEach((item, index) => {
+        Object.keys(item).forEach(key => {
+            formData.append(`${name}[${index}][${key}]`, item[key]);
+        });
+    });
+    return formData;
+}

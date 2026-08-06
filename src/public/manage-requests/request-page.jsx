@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { Input } from '../../components/ui/input'
-import { CloudUpload, Home, MoveLeft, Search } from 'lucide-react'
+import { CircleMinus, CirclePlus, CloudUpload, Home, MoveLeft, Search, Trash, Trash2Icon } from 'lucide-react'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../../components/ui/select';
-import { directorates } from '../../lib/data';
+//import { directorates } from '../../lib/data';
 import FileUploadComponent from '../../components/file-upload-component';
 import { Button } from '../../components/ui/button';
 import SkeletonComponent from '../../components/skeleton-component';
@@ -12,6 +12,11 @@ import Dropzone from 'shadcn-dropzone';
 import useExcelConverter from '../../hooks/useExcelConverter';
 import { toast } from 'sonner';
 import { formatDateAndTime, removeDuplicateSentences } from '../../utils/functions';
+import { fetchDirectorates, fetchUnits } from '../../utils/users';
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '../../components/ui/dialog';
+import { cn } from "@/lib/utils";
+import { HiPlus } from 'react-icons/hi';
+import OtherDocumentsUploader from '../../auth-pages/settings/other-documents-uploader';
 
 const RequestPage = () => {
 
@@ -28,23 +33,22 @@ const RequestPage = () => {
     const [searching, setSearching] = useState(false);
     const [file, setFile] = useState();
     const [submitting, setSubmitting] = useState(false);
-
+    const [directorates, setDirectorates] = useState();
+    const [fetching, setFetching] = useState(false);
+    const [filtering, setFiltering] = useState(false);
+    const [projectname, setProjectname] = useState();
+    const [budgetLineItem, setBudgetLineItem] = useState();
+    const [grantname, setGrantname] = useState();
+    const [grantcode, setGrantcode] = useState();
     const { data, loading, convertToJson, clearData } = useExcelConverter();
+    const [otherdocuments, setOtherdocuments] = useState(false);
 
-    const getDirectorateUnits = () => {
-        let filteredUnits;
-
-        if(selectedDirectorate){
-            directorates.filter(dir => {
-                if(dir.title === selectedDirectorate){
-                    filteredUnits = dir.units;
-                }
-            }) 
-        }
-        return filteredUnits;
+    const toggleOtherDocuments = () => {
+        setOtherdocuments(!otherdocuments);
     }
 
     const handleFileDrop = async (acceptedFiles) => {
+        //setIsDialogOpen(true);
         // This function is called when files are dropped or selected
         //console.log("Files received:", acceptedFiles[0]);
         //setFile(acceptedFiles[0]);
@@ -78,9 +82,14 @@ const RequestPage = () => {
             selectedUnit,
             email,
             title,
-            file : data
+            projectname,
+            budgetLineItem,
+            grantname,
+            grantcode,
+            exceldata : data
         }
         
+        //console.log(rdata);
         submitProcurementRequest(rdata, setSuccess, setError, setSubmitting)
     }
 
@@ -104,13 +113,22 @@ const RequestPage = () => {
     }
 
     useEffect(() => {
-        setUnits(getDirectorateUnits());
+        fetchDirectorates(setDirectorates, setError, setFetching)
+    }, [])
+
+    useEffect(() => {
+        //setUnits(getDirectorateUnits());
+        const data = {
+            directorate:selectedDirectorate
+        }
+        selectedDirectorate && fetchUnits(data, setUnits, setError, setFiltering)
     }, [selectedDirectorate])
 
     useEffect(() => {
         (trackingid && trackingid.length > 10) && 
         searchTrackingid({ trackingid }, setTrackingdata, setError, setSearching);
     }, [trackingid])
+
 
     return (
         <div className='flex justify-center bg-background p-4'>
@@ -120,11 +138,11 @@ const RequestPage = () => {
                         <Home size={16} />
                         <span>Back to Home</span>
                     </a>
-                    <span className='text-4xl md:text-7xl font-extralight text-brand mt-[-5px]'>
+                    <span className='text-3xl md:text-5xl font-extralight text-brand mt-2'>
                         Submit and track your requests
                     </span>
                 </div>
-                <div className='w-full grid gap-2 md:gap-4 md:my-2'>
+                <div className='w-full grid gap-2 md:gap-4 md:my-1'>
                     <span className='text-lg md:text-2xl font-extralight'>
                         Provide tracking ID to check the status of your request
                     </span>
@@ -140,14 +158,14 @@ const RequestPage = () => {
                 </div>
                 <div className='w-full flex items-center gap-1'>
                     <div className='w-full border-t border-muted-foreground'></div>
-                    <span className='text-3xl md:text-5xl mx-auto font-extralight max-w-max text-brand'>OR</span>
+                    <span className='text-xl md:text-3xl mx-auto font-normal max-w-max text-brand'>OR</span>
                     <div className='w-full border-t border-muted-foreground'></div>
                 </div>
             {
                 searching ? <ButtonLoader loadingText={`Searching records for ${trackingid}...`} /> :
                 (trackingdata ? (
                     trackingdata?.id ? 
-                        <div className='w-full grid gap-4 p-4 rounded-xl border border-accent bg-accent/20 text-xl md:text-2xl font-extralight my-2'>
+                        <div className='w-full grid gap-4 p-4 rounded-xl border border-accent bg-accent/20 text-lg md:text-xl font-extralight my-1'>
                             <div className='grid gap-0'>
                                 <span className='text-sm'>Request status</span>
                                 <span>{trackingdata?.request_title} request with Tracking ID <span className='font-normal'>{trackingdata?.trackingid}</span> from {trackingdata?.unit} unit of {trackingdata?.directorate} directorate is <span className='font-normal'>{trackingdata?.request_status}</span></span>
@@ -156,33 +174,52 @@ const RequestPage = () => {
                                 <span className='text-sm'>Request was made by</span>
                                 <span>{trackingdata?.email} on {formatDateAndTime(trackingdata?.created_at)}</span>
                             </div>
+                            <div className='w-full flex items-center gap-4'>
+                                <span className='text-3xl font-extralight'>Do you want to upload supporting documents?</span>
+                            {
+                                otherdocuments ?
+                                    <CircleMinus 
+                                        className='text-2xl w-8 h-8 cursor-pointer hover:text-muted-foreground' 
+                                        onClick={() => toggleOtherDocuments()} 
+                                    /> :
+                                    <CirclePlus 
+                                    className='text-2xl w-8 h-8 cursor-pointer hover:text-muted-foreground' 
+                                    onClick={() => toggleOtherDocuments()}
+                                />
+                            }
+                                
+                            </div>
+                        {
+                            otherdocuments &&
+                            <OtherDocumentsUploader request_id={trackingdata?.trackingid} />
+                        }
                             <span>Do you want to submit a new request? <span className='text-accent cursor-pointer hover:text-accent/50 hover:underline' onClick={() => setTrackingdata()}>Click here</span></span>
                         </div>
                         :
-                        <div className='w-full grid gap-2 md:gap-6 p-4 rounded-xl border border-brand bg-brand/20 text-xl md:text-4xl font-extralight my-2'>
+                        <div className='w-full grid gap-2 md:gap-6 p-4 rounded-xl border border-brand bg-brand/20 text-xl md:text-4xl font-extralight my-1'>
                             <span>No record found for Tracking ID {trackingid}!</span>
                             <span>Do you want to submit a new request? <span className='text-accent cursor-pointer hover:text-accent/50 hover:underline' onClick={() => setTrackingdata()}>Click here</span></span>
                         </div>
                 ) :
-                <div className='w-full grid gap-3 md:gap-6'>
-                    <p className='w-full text-xl md:text-3xl font-extralight leading-normal'>
+                <div className='w-full grid gap-3'>
+                    <p className='w-full text-xl md:text-2xl font-extralight leading-normal'>
                     Submit a new request
                     </p>
                     <form onSubmit={handleSubmit} className='w-full grid md:flex md:items-start gap-0 dark:gap-4 border border-border shadow-xl dark:border-none dark:shadow-none rounded-xl'>
-                        <div className='w-full md:w-3/5 grid gap-4 bg-card/30 p-6 rounded-xl dark:shadow-xl'>
+                        <div className='w-full md:w-3/6 grid gap-4 bg-card/30 p-4 rounded-xl dark:shadow-xl'>
                             <Select
                                 value={selectedDirectorate} // Reflects the current state
                                 onValueChange={setSelectedDirectorate} // Updates the state on selection
                             >
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select a directorate" />
+                                    <SelectValue placeholder={fetching ? "fetching directorates..." : "Select a directorate"} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
                                     <SelectLabel>Directorate</SelectLabel>
                                     {
-                                        directorates.map( dir => (
-                                            <SelectItem key={dir.id} value={dir.title}>{dir.title}</SelectItem>
+                                        directorates && directorates.map( dir => (
+                                            <SelectItem key={dir.id} value={dir.directorate}>{dir.directorate}</SelectItem>
                                         ))
                                     }
                                     </SelectGroup>
@@ -193,14 +230,14 @@ const RequestPage = () => {
                                 onValueChange={setSelectedUnit} // Updates the state on selection
                             >
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select a unit" />
+                                    <SelectValue placeholder={filtering ? "fetching units..." : "Select a unit"} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
                                     <SelectLabel>Unit</SelectLabel>
                                     {
                                         units && units.length > 0 && units.map( un => (
-                                            <SelectItem key={un.id} value={un.title}>{un.title}</SelectItem>
+                                            <SelectItem key={un.id} value={un.unit}>{un.unit}</SelectItem>
                                         ))
                                     }
                                     </SelectGroup>
@@ -218,32 +255,55 @@ const RequestPage = () => {
                                 required
                                 onChange={(e) => setTitle(e.target.value)}
                             />
+                            <Input 
+                                type="text"
+                                placeholder="Project name"
+                                required
+                                onChange={(e) => setProjectname(e.target.value)}
+                            />
                         </div>
-                        <div className='w-full md:w-2/5 grid gap-4 bg-card/30 p-6 rounded-xl dark:shadow-xl'>
+                        <div className='w-full md:w-3/6 grid gap-4 bg-card/30 p-4 rounded-xl dark:shadow-xl'>
+                            <Input 
+                                type="text"
+                                placeholder="Budget cost category line item"
+                                required
+                                onChange={(e) => setBudgetLineItem(e.target.value)}
+                            />
+                            <Input 
+                                type="text"
+                                placeholder="Grant name"
+                                required
+                                onChange={(e) => setGrantname(e.target.value)}
+                            />
+                            <Input 
+                                type="text"
+                                placeholder="Grant code"
+                                required
+                                onChange={(e) => setGrantcode(e.target.value)}
+                            />
                             {/**<FileUploadComponent doc={doc} /> */}
                             <Dropzone onDrop={handleFileDrop}>
                             {({ getRootProps, getInputProps, isDragAccept, acceptedFiles }) => (
                                 <div
                                 {...getRootProps()}
-                                className={`p-6 rounded-lg text-center cursor-pointer transition-colors ${
+                                className={`p-4 rounded-lg text-center cursor-pointer transition-colors ${
                                     isDragAccept ? 'border-green-500 bg-green-50' : 'border-gray-300'
                                 }`}
                                 >
-                                <input {...getInputProps()} />
-                                {isDragAccept ? (
-                                    <p className="text-green-600">Drop your files here...</p>
-                                ) : (
-                                    <p>Drag & drop a file here, or click to select one</p>
-                                )}
-                                <div className='flex justify-center items-center mt-4'>
-                                    {acceptedFiles.length > 0 ? 
-                                        <span className="text-sm text-gray-500 mt-2">
-                                        {acceptedFiles[0]?.name} file selected
-                                        </span>
-                                        : <span>...</span>
-                                    }
-                                </div>
-                                
+                                    <input {...getInputProps()} />
+                                    {isDragAccept ? (
+                                        <p className="text-green-600">Drop your files here...</p>
+                                    ) : (
+                                        <p className='text-sm'>Click to select procurement items excel document</p>
+                                    )}
+                                    <div className='flex justify-center items-center mt-2'>
+                                        {acceptedFiles.length > 0 ? 
+                                            <span className="text-sm text-gray-500 mt-0">
+                                            {acceptedFiles[0]?.name} file selected
+                                            </span>
+                                            : <span>...</span>
+                                        }
+                                    </div>
                                 </div>
                             )}
                             </Dropzone>
@@ -251,7 +311,7 @@ const RequestPage = () => {
                                 type="submit"
                                 disabled={submitting}
                                 variant='outline'
-                                className="bg-accent hover:bg-accent/80 px-4 py-6"
+                                className="bg-accent hover:bg-accent/80 px-4 py-4"
                             >
                             {
                                 submitting ? (

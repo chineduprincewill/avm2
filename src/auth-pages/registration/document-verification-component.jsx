@@ -25,6 +25,9 @@ const DocumentVerificationComponent = ({ docToVerify, setVerified, document, fie
             })
             setMatchValue(vals);
         }
+        else{
+            setUpdate('matched');
+        }
     }
     
     useEffect(() => {

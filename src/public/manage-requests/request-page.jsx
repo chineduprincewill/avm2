@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Input } from '../../components/ui/input'
 import { CircleMinus, CirclePlus, CloudUpload, Home, MoveLeft, Search, Trash, Trash2Icon } from 'lucide-react'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../../components/ui/select';
@@ -17,9 +17,11 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '../../compone
 import { cn } from "@/lib/utils";
 import { HiPlus } from 'react-icons/hi';
 import OtherDocumentsUploader from '../../auth-pages/settings/other-documents-uploader';
+import { AppContext } from '../../context/AppContext';
 
 const RequestPage = () => {
 
+    const { user } = useContext(AppContext);
     const [selectedDirectorate, setSelectedDirectorate] = useState();
     const [selectedUnit, setSelectedUnit] = useState();
     const [units, setUnits] = useState();
@@ -80,7 +82,7 @@ const RequestPage = () => {
         const rdata = {
             selectedDirectorate,
             selectedUnit,
-            email,
+            email: user ? JSON.parse(user)?.email : email,
             title,
             projectname,
             budgetLineItem,
@@ -243,12 +245,15 @@ const RequestPage = () => {
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
-                            <Input 
-                                type="email"
-                                placeholder="Email"
-                                required
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
+                            {
+                                !user &&
+                                <Input 
+                                    type="email"
+                                    placeholder="Email"
+                                    required
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                            }
                             <Input 
                                 type="text"
                                 placeholder="Request title"

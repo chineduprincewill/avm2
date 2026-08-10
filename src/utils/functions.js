@@ -38,6 +38,12 @@ export const statusColor = (stat) => {
             return 'text-green-500';
         case 'declined...':
             return 'text-red-500';
+        case 'awaiting rating...':
+            return 'text-orange-500';
+        case 'rating in progress...':
+            return 'text-brand';
+        case 'rating completed':
+            return 'text-green-600';
         default:
             return 'text-red-500';
     }
@@ -149,4 +155,39 @@ export const appendArrayToFormData = (formData, array, name) => {
         });
     });
     return formData;
+}
+
+
+export const sumRatings = (ratingObj) => {
+    const sum = Object.values(ratingObj).reduce((acc, value) => {
+        return acc + Number(value);
+    }, 0);
+    return sum;
+}
+
+export const sumArrayRatings = (ratingArr) => {
+    const sum = ratingArr.reduce((acc, item) => {
+        return acc + item.total;
+    }, 0);
+    return sum;
+}
+
+
+export const sumArrayTotalRatings = (ratingArr) => {
+    const sum = ratingArr.reduce((acc, item) => {
+        return acc + parseInt(item.options);
+    }, 0);
+    return sum;
+}
+
+export const roundBasedOnDecimal = (num) => {
+    // Get the decimal part
+    const decimal = num - Math.floor(num);
+    
+    // Check if decimal is less than 0.5
+    if (decimal < 0.5) {
+        return Math.floor(num); // Round down
+    } else {
+        return Math.ceil(num); // Round up
+    }
 }

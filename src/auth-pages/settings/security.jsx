@@ -18,8 +18,9 @@ import { InfoIcon, LucideMinus, LucidePlus } from 'lucide-react';
 import DocumentsValidationSettings from './documents-validation-settings';
 import ManageDirectorates from './manage-directorates';
 import ManageUnits from './manage-units';
+import FormFields from '../forms/form-fields';
 
-const Security = () => {
+const Security = ({ active }) => {
 
     const { token, user, record } = useContext(AppContext);
     const [profile, setProfile] = useState();
@@ -30,6 +31,7 @@ const Security = () => {
     const [docConf, setDocConf] = useState(false);
     const [showDirectorates, setShowDirectorates] = useState(false);
     const [showUnits, setShowUnits] = useState(false);
+    const [ratingConf, setRatingConf] = useState(false);
 
     const usr = user && JSON.parse(user);
 
@@ -53,6 +55,10 @@ const Security = () => {
         setShowUnits(!showUnits)
     }
 
+    const toggleRatingConf = () => {
+        setRatingConf(!ratingConf)
+    }
+
     useEffect(() => {
         fetchUserProfile(token, setProfile, setError, setLoading)
     }, [record])
@@ -62,125 +68,80 @@ const Security = () => {
             <div className='w-full hidden justify-between items-center'>
                 <span className='text-xl font-extralight'>Security</span>
             </div>
-            <div className='w-full grid md:flex md:justify-between md:items-start gap-4'>
-                <div className='w-full md:w-[49%]'>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex justify-between items-center">
-                                <span>Profile information</span>
-                                <div 
-                                    className='cursor-pointer'
-                                    onClick={() => toggleProfile()}
-                                >
-                                {
-                                    showprofile ? 
-                                        <LucideMinus /> :
-                                        <LucidePlus />
-                                }
-                                </div>
-                            </CardTitle>
-                            <CardDescription>
-                            Below is your profile information. 
-                            {
-                                usr && usr?.category === 'vendor' && 'You can update your username, email and phone no. However, it will only reflect on admin approval'
-                            }
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent
-                            className={`${showprofile ? 'block' : 'hidden'}`}
-                        >
-                        {
-                            loading || !profile ?
-                                <SkeletonComponent /> : 
-                                <ProfileInformation profile={profile} />
-                        }
-                        </CardContent>
-                    </Card>
-                </div>
-                <div className='grid gap-4 w-full md:w-[49%]'>
-                    <Card>
-                        <CardHeader>
-                        <CardTitle className="flex justify-between items-center">
-                                <span>Password update</span>
-                                <div 
-                                    className='cursor-pointer'
-                                    onClick={() => togglePasswordupdate()}
-                                >
-                                {
-                                    passwordupdate ? 
-                                        <LucideMinus /> :
-                                        <LucidePlus />
-                                }
-                                </div>
-                            </CardTitle>
-                            <CardDescription>
-                            Secure your account
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent
-                            className={`${passwordupdate ? 'block' : 'hidden'}`}
-                        >
-                            <PasswordUpdate />
-                        </CardContent>
-                    </Card>
-                </div>
-            </div>
             {
-                (usr?.category === 'system' && usr?.role === 'admin') &&
-                <div className='w-full'>
+                active === 'p_info' &&
+                <div className='w-full grid md:flex md:justify-between md:items-start gap-4'>
+                    <div className='w-full md:w-[49%]'>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex justify-between items-center">
+                                    <span>Profile information</span>
+                                </CardTitle>
+                                <CardDescription>
+                                Below is your profile information. 
+                                {
+                                    usr && usr?.category === 'vendor' && 'You can update your username, email and phone no. However, it will only reflect on admin approval'
+                                }
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                            {
+                                loading || !profile ?
+                                    <SkeletonComponent /> : 
+                                    <ProfileInformation profile={profile} />
+                            }
+                            </CardContent>
+                        </Card>
+                    </div>
+                    <div className='grid gap-4 w-full md:w-[49%]'>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex justify-between items-center">
+                                    <span>Password update</span>
+                                </CardTitle>
+                                <CardDescription>
+                                Secure your account
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <PasswordUpdate />
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            }
+            {
+                (active === 'd_info' && usr?.category === 'system' && usr?.role === 'admin') &&
+                <div className='w-full overflow-scroll'>
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex justify-between items-center">
                             <span>Document upload validation configuration</span>
-                            <div 
-                                className='cursor-pointer'
-                                onClick={() => toggleDocConf()}
-                            >
-                            {
-                                docConf ? 
-                                    <LucideMinus /> :
-                                    <LucidePlus />
-                            }
-                            </div>
                         </CardTitle>
                         <CardDescription>
                         Set document upload validation rules here
                         </CardDescription>
                     </CardHeader>
-                    <CardContent
-                        className={`${docConf ? 'block' : 'hidden'}`}
-                    >
+                    <CardContent>
                         <DocumentsValidationSettings />
                     </CardContent>
                 </Card>
                 </div>
             }
             {
-                (usr?.category === 'system' && usr?.role === 'admin') &&
-                <div className='w-full grid md:flex md:justify-between md:items-start gap-4'>
+                (active === 'g_info' && usr?.category === 'system' && usr?.role === 'admin') &&
+                <div className='w-full grid md:flex md:justify-between md:items-start gap-4 overflow-scroll'>
                     <div className='w-full md:w-[49%]'>
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex justify-between items-center">
                                     <span>Directorate</span>
-                                    <div 
-                                        className='cursor-pointer'
-                                        onClick={() => toggleDirectorate()}
-                                    >
-                                    {
-                                        showDirectorates ? 
-                                            <LucideMinus /> :
-                                            <LucidePlus />
-                                    }
-                                    </div>
                                 </CardTitle>
                                 <CardDescription>
                                     Manage your directorates. 
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent
-                                className={`${showDirectorates ? 'block' : 'hidden'}`}
-                            >
+                            <CardContent>
                                 <ManageDirectorates />
                             </CardContent>
                         </Card>
@@ -188,30 +149,36 @@ const Security = () => {
                     <div className='grid gap-4 w-full md:w-[49%]'>
                         <Card>
                             <CardHeader>
-                            <CardTitle className="flex justify-between items-center">
+                                <CardTitle className="flex justify-between items-center">
                                     <span>Units</span>
-                                    <div 
-                                        className='cursor-pointer'
-                                        onClick={() => toggleUnits()}
-                                    >
-                                    {
-                                        showUnits ? 
-                                            <LucideMinus /> :
-                                            <LucidePlus />
-                                    }
-                                    </div>
                                 </CardTitle>
                                 <CardDescription>
                                     Manage your Units. 
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent
-                                className={`${showUnits ? 'block' : 'hidden'}`}
-                            >
+                            <CardContent>
                                 <ManageUnits />
                             </CardContent>
                         </Card>
                     </div>
+                </div>
+            }
+            {
+                (active === 'v_info' && usr?.category === 'system' && usr?.role === 'admin') &&
+                <div className='w-full overflow-scroll'>
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex justify-between items-center">
+                            <span>Forms management</span>
+                        </CardTitle>
+                        <CardDescription>
+                            Create and manage your forms
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <FormFields />
+                    </CardContent>
+                </Card>
                 </div>
             }
         </div>

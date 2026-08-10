@@ -47,6 +47,8 @@ const Vendors = () => {
                             <VendorReviewDashboard vendor={vnd} />
                         </DialogContent>
                     </Dialog>
+                {
+                    user && JSON.parse(user)?.role === 'admin' &&
                     <Dialog>
                         <DialogTrigger asChild>
                             <UserStar 
@@ -58,6 +60,7 @@ const Vendors = () => {
                             <VendorRatingModal vendor={vnd} />
                         </DialogContent>
                     </Dialog>
+                }
                     <div className='grid pl-4'>
                         <span className='text-xs text-muted-foreground'>
                         { vnd?.email}
@@ -119,23 +122,15 @@ const Vendors = () => {
                 const vnd = row.original;       
                 const limit = 5;     
                 return (
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <div 
-                                className='flex items-center gap-1 cursor-pointer'
-                            >
-                                {[...Array(limit)].map((_, i) => (
-                                    <BsStarFill key={i} 
-                                        className={`${i < vnd?.vendor_rating ? 'text-orange-400' : 'text-muted-foreground/20' }`} 
-                                    />
-                                ))}
-                            </div>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogTitle></DialogTitle>
-                            <VendorRatingModal vendor={vnd} />
-                        </DialogContent>
-                    </Dialog>
+                    <div 
+                        className='flex items-center gap-1'
+                    >
+                        {[...Array(limit)].map((_, i) => (
+                            <BsStarFill key={i} 
+                                className={`${i < vnd?.vendor_rating ? 'text-orange-400' : 'text-muted-foreground/20' }`} 
+                            />
+                        ))}
+                    </div>
                 );
             },
             enableSorting: true,

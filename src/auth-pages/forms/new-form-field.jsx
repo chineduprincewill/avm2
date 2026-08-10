@@ -9,85 +9,77 @@ import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 import React, { useContext, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { fetchFormFieldCategories, fetchFormfields, getDependentFieldOptions, updateFormField } from '../../utils/forms'
+import { addField, fetchFormFieldCategories, fetchFormfields, getDependentFieldOptions, updateFormField } from '../../utils/forms'
 import { AppContext } from '../../context/AppContext'
+import { Switch } from '../../components/ui/switch'
 
-const NewFormField = ({ formid, setIsCreated, isEdit, setIsUpdating, reloadform, setReloadform }) => {
+const NewFormField = ({ fld }) => {
 
-    const { token } = useContext(AppContext);
+    const { token, refreshRecord } = useContext(AppContext);
     //const [id, setId] = useState();
     //const [formcategory, setFormcategory] = useState();
-    const [fieldName, setFieldName] = useState();
-    const [label, setLabel] = useState();
-    const [type, setType] = useState();
-    const [required, setRequired] = useState();
-    const [options, setOptions] = useState();
-    const [field_info, setField_info] = useState();
-    const [dependent, setDependent] = useState();
-    const [logic,setLogic] = useState();
+    const [form_id, setForm_id] = useState(fld && fld?.form_id);
+    const [field_name, setField_name] = useState(fld && fld?.field_name);
+    const [label, setLabel] = useState(fld && fld?.label);
+    const [type, setType] = useState(fld && fld?.type);
+    const [required, setRequired] = useState(fld && fld?.required);
+    const [options, setOptions] = useState(fld && fld?.options);
+    const [field_info, setField_info] = useState(fld && fld?.field_info);
     const [success, setSuccess] = useState();
     const [error, setError] = useState();
     const [adding, setAdding] = useState(false);
-    const [formfields, setFormfields] = useState();
-    const [loading, setLoading] = useState(false);
-    //const [reloadform, setReloadform] = useState(false);
-    const [categories, setCategories] = useState([]);
-    const [value, setValue] = useState()
-    const [d_options, setD_options] = useState();
-    
-    const data = {
-        formid
+    const [active, setActive] = useState(fld && fld?.status)
+
+    const toggleActive = () => {
+        fld && active === 1 ? setActive(0) : setActive(1)
     }
 
-    const handleUpdate = () => {
+    const handleUpdate = (e) => {
+        e.preventDefault();
 
-        if(!label || !type || !required || !dependent){
-            toast.error("One or more required fields are empty!", {
-                className: "!bg-red-700 !text-white !border-white !font-bold",
-                descriptionClassName: "!text-red-700",
-            });
-        }
-        else{
-            const data = {
-                formcategory:value,
-                formid,
-                fieldName,
+        if(window.confirm('Are you sure all your entries are correct?')){
+            let data = fld ?
+            {
+                id:fld?.id,
+                form_id,
+                field_name,
                 label, 
                 type,
                 required,
                 options,
                 field_info,
-                dependent,
-                logic
+                active
+            } :
+            {
+                form_id,
+                field_name,
+                label, 
+                type,
+                required,
+                options,
+                field_info,
+                active
             }
 
-            if(isEdit){
-                data.id = isEdit?.id
-            }
-
-            console.log(data);
-            
-            updateFormField(token, data, setSuccess, setError, setAdding)
-            //addFormField(data, setSuccess, setError, setAdding)
+            console.log(data)
+            addField(token, data, setSuccess, setError, setAdding)
         }
     }
 
     if(success){
-        toast.success("Form field created successfully!", {
+        toast.success(`Form field ${fld ? 'updated' : 'created'} successfully!`, {
             className: "!bg-green-700 !text-white !border-white !font-bold",
             descriptionClassName: "!text-green-700",
         });
         //router.push('/forms');
         setSuccess();
         setLabel('');
-        setFieldName('')
+        setField_name('')
         setRequired('');
-        setDependent('');
         setType('');
         setOptions('');
         setField_info('');
-        setIsCreated(Date.now());
-        setIsUpdating(true);
+        refreshRecord(Date.now())
     }
 
     if(error){
@@ -98,74 +90,24 @@ const NewFormField = ({ formid, setIsCreated, isEdit, setIsUpdating, reloadform,
         setError();
     }
 
-    const initFormReload = () => {
-        setReloadform(true);
-        //setTimeout(() => setReloadform(false), 2000)
-    }
-
-    const dependentOptions = () => {
-        let options;
-        options = (d_options && Array.isArray(d_options) && d_options.length > 0) ? 
-        d_options.map((opt, index) => (
-            <SelectItem key={index} value={opt}>{opt}</SelectItem>
-        )) : <SelectItem value="N/A">N/A</SelectItem>
-        return options
-    }
-
-    useEffect(() => {
-        //fetchFormfields(data, setFormfields, setError, setLoading)
-    }, [])
-
-    useEffect(() => {
-        //setReloadform(true)
-        if(isEdit){
-            setFieldName(isEdit?.fieldName);
-            setLabel(isEdit?.label);
-            setType(isEdit?.type);
-            setOptions(isEdit?.options);
-            setRequired(isEdit?.required);
-            setDependent(isEdit?.depends_on);
-            setValue(isEdit?.form_category)
-            setLogic(isEdit?.logic)
-            setField_info(isEdit?.field_info)
-        }
-    }, [isEdit])
-
-    useEffect(() => {
-        fetchFormfields(token, { formid }, setFormfields, setError, setLoading);
-    }, [])
-
-    useEffect(() => {
-        reloadform && setTimeout(() => setReloadform(false), 2000)
-    }, [reloadform])
-
-    useEffect(() => {
-        fetchFormFieldCategories(token, data, setCategories, setError, setLoading)
-    }, [reloadform])
-
-    useEffect(() => {
-        if(dependent && dependent !== 'none'){
-            const data = {
-                form_id:formid,
-                fieldName:dependent
-            }
-            getDependentFieldOptions(token, data, setD_options, setError, setLoading)
-        }
-    }, [dependent])
-
-    console.log(dependentOptions());
-
     return (
-        reloadform ?
-        <SkeletonComponent />
-        :
         <div className='w-full'>
-            <div className={`w-full grid gap-4`}>
-                <ComboboxComponent comboOptions={categories} value={value} setValue={setValue} />
+            <form onSubmit={handleUpdate} className={`w-full grid gap-4`}>
+                <div className='grid gap-1'>
+                    <Input 
+                        value={form_id}
+                        placeholder="Enter form id...( join words with underscore ( _ ) )*"
+                        onChange={(e) => setForm_id(e.target.value)}
+                        required
+                        className="w-full"
+                    />
+                    <small className='text-xs text-brand px-1'>Phrase that identifies the form. Should be same for all fields of the same form.</small>
+                </div>
+                
                 <Input 
-                    value={fieldName}
-                    placeholder="Enter field name (fieldName)*"
-                    onChange={(e) => setFieldName(e.target.value)}
+                    value={field_name}
+                    placeholder="Enter field id...( join words with underscore ( _ ) )*"
+                    onChange={(e) => setField_name(e.target.value)}
                     required
                     className="w-full"
                 />
@@ -224,62 +166,34 @@ const NewFormField = ({ formid, setIsCreated, isEdit, setIsUpdating, reloadform,
                     className="w-full"
                     onChange={(e) => setField_info(e.target.value)}
                 />
-                <Select
-                    value={dependent}
-                    required
-                    onValueChange={setDependent}
-                >
-                    <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select dependent if any *" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            <SelectLabel>Dependent</SelectLabel>
-                            <SelectItem value="none">none</SelectItem>
-                        {
-                            formfields && formfields.length > 0 && formfields.map(fm => (
-                                <SelectItem key={fm.id} value={fm.fieldName}>{fm.label}</SelectItem>
-                            ))
-                        }
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
                 {
-                    dependent && dependent !== 'none'
-                    &&
-                    <Select
-                        value={logic ?? ''}
-                        required
-                        onValueChange={setLogic}
-                    >
-                        <SelectTrigger className="w-full">
-                            <SelectValue placeholder={loading ? "loading..." : "Dependent value"} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                <SelectLabel>Dependent value</SelectLabel>
-                            {
-                                dependentOptions()
-                            }
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
+                    fld && 
+                    <div className="flex items-center space-x-2">
+                        <Switch
+                            id="status"
+                            checked={active === 1}
+                            onCheckedChange={toggleActive}
+                            className="data-[state=checked]:bg-accent"
+                        />
+                        <span>{active === 1 ? 'Enabled' : 'Disabled'}</span>
+                    </div>
                 }
                 <Button 
-                    className="gradient"
-                    onClick={handleUpdate}
+                    className="hover:bg-accent bg-accent/80"
                 >
                 {
-                    adding ?
-                    <div className='flex items-center gap-1'>
-                        <Spinner className="size-4" />
-                        <span>Saving...</span>
-                    </div>
-                    :
-                    <span>Save changes</span>
+                    adding ? (
+                        <span className="flex items-center gap-2">
+                            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                            </svg>
+                            {fld ? "Updating..." : "Submitting..."}
+                        </span>
+                    ) : (fld ? "Update" : "Submit")
                 }
                 </Button>
-            </div>   
+            </form>   
         </div>
     )
 }

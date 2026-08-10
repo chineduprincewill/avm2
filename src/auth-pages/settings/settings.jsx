@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react'
 //import { useAuth } from '../../hooks/useAuth'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
-import { Hospital, House, LockKeyhole, MapPinHouse, User } from 'lucide-react';
+import { BriefcaseBusinessIcon, FileCheckIcon, FileCogIcon, FileIcon, GroupIcon, Hospital, House, LockKeyhole, MapPinHouse, User, UserIcon, UserStarIcon } from 'lucide-react';
 import Users from './Users';
 import Facilities from './Facilities';
 import { fetchGeodata, fetchUsers } from '../../utils/users';
@@ -19,8 +19,32 @@ const Settings = () => {
   const [loading, setLoading] = useState(false);
   const [geodata, setGeodata] = useState([]);
   const [fetching, setFetching] = useState(false);
+  const [active, setActive] = useState('p_info');
 
   const role = JSON.parse(user)?.role;
+
+    const tabs = [
+        {
+            title:'Personal Information',
+            icon: <UserIcon />,
+            action: 'p_info'
+        },
+        {
+            title:'Document validation',
+            icon: <FileCheckIcon />,
+            action: 'd_info'
+        },
+        {
+            title:'Group settings',
+            icon: <GroupIcon />,
+            action: 'g_info'
+        },
+        {
+            title:'Forms management',
+            icon: <FileCogIcon />,
+            action: 'v_info'
+        },
+    ]
 
   return (
     <div className='w-full p-4'>
@@ -35,7 +59,21 @@ const Settings = () => {
                 </p>
             </div>
         )}
-        <Security />
+        <div className='w-full flex flex-wrap gap-4 items-center justify-between'>
+        {
+            tabs.map((item, index) => (
+                <div 
+                    key={index} 
+                    className={`hover:bg-card bg-card/50 flex items-start gap-3 md:w-[31.5%] lg:w-[23.5%] p-4 rounded-md shadow-md cursor-pointer mb-0 ${active === item?.action && '!bg-card border-2 border-accent text-accent font-semibold'}`}
+                    onClick={() => setActive(item?.action)}
+                >
+                    {item?.icon}
+                    <span className='hidden md:block'>{item?.title}</span>
+                </div>
+            ))
+        }
+        </div>
+        <Security active={active} />
     </div>
   )
 }

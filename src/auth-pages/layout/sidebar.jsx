@@ -44,6 +44,12 @@ const Sidebar = ({ isOpen, onClose, isCollapsed, onCollapsedChange }) => {
         { href: "/settings", label: "Settings", icon: Settings },
     ];
 
+    const staffNavItems = [
+        { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+        { href: "/accounts", label: "Accounts", icon: User2Icon },
+        { href: "/settings", label: "Settings", icon: Settings },
+    ];
+
     const userNavItems = [
         { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
         { href: "/registration", label: "Registration", icon: MessageSquareText },
@@ -51,7 +57,9 @@ const Sidebar = ({ isOpen, onClose, isCollapsed, onCollapsedChange }) => {
         { href: "/settings", label: "Settings", icon: Settings },
     ];
 
-    const navItems = userdata?.category === 'system' ? adminNavItems : userNavItems;
+    const navItems = userdata?.category === 'system' ? (
+        userdata?.role === 'staff' ? staffNavItems : adminNavItems
+    ) : userNavItems;
 
     const isActive = (href) => location.pathname === href;
 

@@ -3,32 +3,37 @@ import { DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHead
 import { Button } from '../../components/ui/button'
 import { Star } from 'lucide-react';
 import { AppContext } from '../../context/AppContext';
-import { submitVendorRating } from '../../utils/forms';
+import { submitVendorForRating, submitVendorRating } from '../../utils/forms';
 import { toast } from 'sonner';
+import { Label } from '../../components/ui/label';
+import { Input } from '../../components/ui/input';
 
 const VendorRatingModal = ({ vendor }) => {
 
     const { token, refreshRecord } = useContext(AppContext);
-    const [rating, setRating] = useState(vendor?.vendor_rating);
+    const [sender, setSender] = useState();
+    const [processor, setProcessor] = useState();
     const [success, setSuccess] = useState();
     const [error, setError] = useState();
     const [submitting, setSubmitting] = useState(false);
-    
-    const limit = 5;
 
-    const submitRating = () => {
-        if(window.confirm(`Are you sure you are rating ${vendor?.vendor_name} as a ${rating}-Star vendor?`)){
+    const submitForRating = (e) => {
+
+        e.preventDefault();
+
+        if(window.confirm(`Are you sure you want to submit ${vendor?.vendor_name} for rating?`)){
             const data = {
-                id : vendor?.id,
-                rating
+                vendor_id : vendor?.id,
+                sender,
+                processor
             }
 
-            submitVendorRating(token, data, setSuccess, setError, setSubmitting)
+            submitVendorForRating(token, data, setSuccess, setError, setSubmitting)
         }
     }
 
     if(success){
-        toast.success(`${vendor?.vendor_name} rated as a ${rating}-Star vendor successfully!`, {
+        toast.success(`${vendor?.vendor_name} submitted for rating!`, {
             className: "!bg-green-700 !text-white !border-white !font-bold",
             descriptionClassName: "!text-green-700",
         })
@@ -43,30 +48,40 @@ const VendorRatingModal = ({ vendor }) => {
         });
     }
 
-
     return (
         <DialogContent>
             <DialogHeader>
-                <DialogTitle className="text-2xl font-extralight">Rate {vendor?.vendor_name}</DialogTitle>
-                <DialogDescription>
-                Select Star to rate this vendor
+                <DialogTitle className="font-extralight">Submit for rating</DialogTitle>
+                <DialogDescription className="text-2xl font-extralight">
+                {vendor?.vendor_name}
                 </DialogDescription>
             </DialogHeader>
-            <div className='w-full grid gap-8'>
-                <div className='w-full flex items-center justify-center gap-4'>
-                {[...Array(limit)].map((_, i) => (
-                    <Star 
-                        size={40}
-                        key={i} 
-                        className={`${i < rating ? 'text-orange-400' : 'text-muted-foreground/20' }`} 
-                        onClick={() => setRating(i+1)}
+            {/* Divider */}
+            <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
+            <form onSubmit={submitForRating} className='w-full grid gap-4'>
+                <div className='grid gap-2'>
+                    <Label className="text-muted-foreground">Sender</Label>
+                    <Input 
+                        type="email"
+                        className="p-2 rounded-md"
+                        placeholder="sender email"
+                        required
+                        onChange={(e) => setSender(e.target.value)}
                     />
-                ))}
+                </div>
+                <div className='grid gap-2'>
+                    <Label className="text-muted-foreground">Reviewer</Label>
+                    <Input 
+                        type="email"
+                        className="p-2 rounded-md"
+                        placeholder="reviewer email"
+                        required
+                        onChange={(e) => setProcessor(e.target.value)}
+                    />
                 </div>
                 <Button 
                     variant="outline"
                     className="bg-accent hover:bg-accent/80 dark:text-black"
-                    onClick={() => submitRating()}
                 >
                     {submitting ? (
                     <span className="flex items-center gap-2">
@@ -80,7 +95,7 @@ const VendorRatingModal = ({ vendor }) => {
                     "Submit rating"
                     )}
                 </Button>
-            </div>
+            </form>
             <DialogFooter>
                 <DialogClose asChild>
                     <Button variant="outline">Cancel</Button>

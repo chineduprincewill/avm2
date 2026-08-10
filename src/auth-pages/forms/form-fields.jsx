@@ -1,38 +1,32 @@
 import React, { useContext, useEffect, useState } from 'react';
 import DataTable from '@/components/data-table';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
-import { CheckCircle2Icon, Edit, KeyRound } from 'lucide-react';
-import { fetchFormfields, updateFormUid } from '../../utils/forms';
+import { Edit, Plus } from 'lucide-react';
+import { fetchFields } from '../../utils/forms';
 import { AppContext } from '../../context/AppContext';
 import SkeletonComponent from '../../components/skeleton-component';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../../components/ui/select';
-import { Button } from '../../components/ui/button';
-import { Spinner } from '../../components/ui/spinner';
 import { toast } from 'sonner';
+import { removeDuplicateSentences } from '../../utils/functions';
+import { DialogContent, DialogHeader, DialogTitle } from '../../components/ui/dialog';
+import NewFormField from './new-form-field';
 
-const FormFields = ({ formid, isCreated, setIsEdit, isEdit, setIsUpdating, uniqueid }) => {
+const FormFields = () => {
 
     const { token, record, refreshRecord } = useContext(AppContext);
     const [formfields, setFormfields] = useState();
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState();
     const [error, setError] = useState();
-    const [uid, setUid] = useState();
-    const [updating, setUpdating] = useState(false);
-    const [uniqueUpdated, setUniqueUpdated] = useState();
     
     const columns = [
         {
-            accessorKey: 'label',
-            header: 'Field',
+            accessorKey: 'form_id',
+            header: 'Form ID',
             cell: ({row}) => {
                 const field = row.original;
                 return(
                     <div className='flex items-center gap-2'>
-                        <span className="font-extralight">{field.label}</span>
-                    {
-                        field.fieldName === uniqueid && <KeyRound size={14} className='text-accent' />
-                    }
+                        <span className="font-extralight">{field.form_id}</span>
                     </div>
                 )
             },
@@ -40,12 +34,58 @@ const FormFields = ({ formid, isCreated, setIsEdit, isEdit, setIsUpdating, uniqu
             enableColumnFilter: true,
         },
         {
-            accessorKey: 'form_category',
-            header: 'Category',
+            accessorKey: 'field_name',
+            header: 'Field Id',
             cell: ({row}) => {
                 const field = row.original;
                 return(
-                    <span className="font-extralight">{field.form_category}</span>
+                    <div className='flex items-center gap-2'>
+                        <span className="font-extralight">{field.field_name}</span>
+                    </div>
+                )
+            },
+            enableSorting: true,
+            enableColumnFilter: true,
+        },
+        {
+            accessorKey: 'label',
+            header: 'Field name',
+            cell: ({row}) => {
+                const field = row.original;
+                return(
+                    <div className='flex items-center gap-2'>
+                        <span className="font-extralight">{field.label}</span>
+                    </div>
+                )
+            },
+            enableSorting: true,
+            enableColumnFilter: true,
+        },
+        {
+            accessorKey: 'required',
+            header: 'Required?',
+            cell: ({row}) => {
+                const field = row.original;
+                return(
+                    <div className='flex items-center gap-2'>
+                        <span className="font-extralight">{field.required === 'required' ? 'Yes' : 'No'}</span>
+                    </div>
+                )
+            },
+            enableSorting: true,
+            enableColumnFilter: true,
+        },
+        {
+            accessorKey: 'status',
+            header: 'Field status',
+            cell: ({row}) => {
+                const field = row.original;
+                return(
+                    <div className='flex items-center gap-2'>
+                        <span className={`font-extralight ${field.status === 1 ? 'text-green-600' : 'text-red-600'}`}>
+                            {field.status === 1 ? 'Enabled' : 'Disabled'}
+                        </span>
+                    </div>
                 )
             },
             enableSorting: true,
@@ -60,15 +100,17 @@ const FormFields = ({ formid, isCreated, setIsEdit, isEdit, setIsUpdating, uniqu
 
             return (
                 <div className="w-full flex items-center gap-3">
-                <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                    <DialogTrigger asChild>
-                        <Edit 
-                            className="h-4 w-4 cursor-pointer" 
-                            onClick={() => updateFormFields(form)}
-                        />
-                    </DialogTrigger>
-                    <div></div>
-                </Dialog>
+                    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                        <DialogTrigger asChild>
+                            <Edit 
+                                className="h-4 w-4 cursor-pointer" 
+                            />
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogTitle></DialogTitle>
+                            <NewFormField fld={form} />
+                        </DialogContent>
+                    </Dialog>
                 </div>
             );
             },
@@ -77,42 +119,14 @@ const FormFields = ({ formid, isCreated, setIsEdit, isEdit, setIsUpdating, uniqu
 
     const datafilters = [
         {
+            title: "form_id",
+            placeholder: "filter by form ID..."
+        },
+        {
             title: "label",
             placeholder: "filter by label..."
         },
-        {
-            title: "form_category",
-            placeholder: "filter by category..."
-        }
     ]
-
-    const data = {
-        formid
-    }
-
-    const updateFormFields = (fld) => {
-        isEdit && setIsEdit(null);
-        setIsUpdating(true)
-        setIsEdit(fld);
-
-    }
-
-    const handleUpdateFormUid = () => {
-
-        if(!uid){
-            toast.error("Unique Identifier must be selected!", {
-                className: "!bg-red-700 !text-white !border-white !font-bold",
-                descriptionClassName: "!text-red-700",
-            });
-        }
-        else{
-            const data = {
-                formid, uid
-            }
-
-            updateFormUid(token, data, setSuccess, setError, setUpdating)
-        }
-    }
 
     if(success){
             toast.success("Form unique identifier updated successfully!", {
@@ -121,48 +135,37 @@ const FormFields = ({ formid, isCreated, setIsEdit, isEdit, setIsUpdating, uniqu
             });
             refreshRecord(Date.now());
             setSuccess();
-            setUid('');
+    }
+
+    if(error){
+        //alert(JSON.stringify(error.replaceAll(/[\\"{}[\],]/g, '')));
+        toast.error(removeDuplicateSentences(JSON.stringify(error.replaceAll(/[\\"{}[\],]/g, ''))), {
+            className: "!bg-red-700 !text-white !border-white !font-bold",
+            descriptionClassName: "!text-red-700",
+        });
+        setError();
     }
 
     useEffect(() => {
-        fetchFormfields(token, data, setFormfields, setError, setLoading);
-    }, [isCreated, record])
+        fetchFields(token, setFormfields, setError, setLoading);
+    }, [record])
     
     return (
-        <div className='w-full grid gap-4 max-h-120'>
-            <div className='w-full grid gap-4 md:flex md:items-center px-4'>
-                <span className='text-sm text-nowrap'>Set form records Unique Identifier</span>
-                <div className='w-full flex items-center gap-0'>
-                    <Select
-                        required
-                        onValueChange={setUid}
-                    >
-                        <SelectTrigger className="min-w-24">
-                            <SelectValue placeholder="Select Unique ID" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                <SelectLabel>Unique ID</SelectLabel>
-                            {
-                                formfields && formfields.length > 0 && formfields.map(fm => (
-                                    <SelectItem key={fm?.id} value={fm?.fieldName}>{fm?.label}</SelectItem>
-                                ))
-                            }
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
-                    <Button 
-                        className="rounded-l-none rounded-r-md"
-                        onClick={() => handleUpdateFormUid()}
-                    >
-                    {
-                        updating ?
-                        <Spinner /> :<CheckCircle2Icon />
-                    }   
-                    </Button>
-                </div>
+        <div className='w-full grid gap-4'>
+            <div className='flex justify-end'>
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <div className='p-2 rounded-full bg-accent/70 hover:bg-accent/90 cursor-pointer shadow-md'>
+                            <Plus />
+                        </div>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogTitle></DialogTitle>
+                        <NewFormField />
+                    </DialogContent>
+                </Dialog>
             </div>
-            <div className='w-full max-h-96 overflow-y-scroll px-4'>
+            <div className='w-full px-4 overflow-scroll'>
             {
                 loading ? <SkeletonComponent /> :
                 formfields &&

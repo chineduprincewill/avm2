@@ -7,15 +7,17 @@ import { AppContext } from '../../context/AppContext'
 import { Button } from '../../components/ui/button'
 import { vendorConsent } from '../../utils/forms'
 import { toast } from 'sonner'
+import { Checkbox } from '../../components/ui/checkbox'
 
 const CertifyComponent = () => {
 
     const { token } = useContext(AppContext)
-    const [certification, setCertification] = useState();
+    const [certification, setCertification] = useState('Terms and Condition Accepted!');
     const [password, setPassword] = useState();
     const [success, setSuccess] = useState();
     const [error, setError] = useState();
     const [submitting, setSubmitting] = useState(false);
+    const [checked, setChecked] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -53,7 +55,7 @@ const CertifyComponent = () => {
                 </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className='w-full grid gap-4'>
-                <div className='w-full grid gap-1'>
+                {/*<div className='w-full grid gap-1'>
                     <Label className='text-muted-foreground text-sm'>Certification message</Label>
                     <Textarea 
                         value={certification}
@@ -61,6 +63,19 @@ const CertifyComponent = () => {
                         onChange={(e) => setCertification(e.target.value)}
                         required
                     />
+                </div>*/}
+                <div className="flex items-center space-x-2">
+                    <Checkbox
+                        id="terms" 
+                        checked={checked}
+                        onCheckedChange={setChecked}
+                    />
+                    <label 
+                        htmlFor="terms" 
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                        Accept terms and conditions
+                    </label>
                 </div>
                 <div className='w-full grid gap-1'>
                     <Label className='text-muted-foreground text-sm'>Password</Label>
@@ -71,6 +86,8 @@ const CertifyComponent = () => {
                         required
                     />
                 </div>
+            {
+                checked && 
                 <Button
                     type="submit"
                     disabled={submitting}
@@ -88,6 +105,7 @@ const CertifyComponent = () => {
                     "Certify"
                     )}
                 </Button>
+            }
             </form>
         </DialogContent>
     )

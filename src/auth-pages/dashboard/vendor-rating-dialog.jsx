@@ -288,7 +288,7 @@ const VendorRatingDialog = ({ notification }) => {
                 </div>
             </form>
             {
-                (rating_log.length > 2 && user && JSON.parse(user)?.role === 'approver') && 
+                (rating_log.length > 1 && user && JSON.parse(user)?.role === 'approver') && 
                 <FinalizeRating rating_id={notification?.id} log={rating_log} totalRating={fields} vendor={notification?.vendor_id} />
             }
         </div>
